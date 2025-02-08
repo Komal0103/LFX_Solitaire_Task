@@ -1,0 +1,6 @@
+{
+    "cmake.sourceDirectory": "/home/komals/lfx_solitaire/solitaire_again",
+    "files.associations": {
+        "algorithm": "cpp"
+    }
+}

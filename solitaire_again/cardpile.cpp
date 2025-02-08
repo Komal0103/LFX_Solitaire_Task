@@ -1,14 +1,17 @@
 #include "cardpile.h"
-#include "ui_cardpile.h"
 
-CardPile::CardPile(QWidget *parent)
+#include <QString>
+
+CardPile::CardPile(QVector<int> card_indices, QWidget *parent)
     : QGraphicsScene(parent)
-    , ui(new Ui::CardPile)
 {
-    ui->setupUi(this);
+    // ui->setupUi(this);
+    for (QVector<int>::iterator i=card_indices.begin(); i<card_indices.end(); ++i) {
+        QString path = IMAGE_PATH_PREFIX + QString::number(*i) + IMAGE_EXT;
+        card new_card(path, 1, (0, 0));
+    }
 }
 
 CardPile::~CardPile()
 {
-    delete ui;
 }

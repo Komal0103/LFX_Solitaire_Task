@@ -1,22 +1,24 @@
 #include "card.h"
-#include "ui_card.h"
 
 #include <QtWidgets>
 
-card::card(QWidget *parent)
-    : QFrame(parent)
-    , ui(new Ui::card)
+card::card(const QString &path, int z, QPointF position)
 {
     // ui->setupUi(this);
-    setMinimumSize(200, 200);
-    setFrameStyle(QFrame::Sunken | QFrame::StyledPanel);
+    setPixmap(QPixmap(path));
+    setPos(position);
+    setZValue(z);
+    moveBy(10, 10);
+    show();
+    // setMinimumSize(200, 200);
+    // setFrameStyle(QFrame::Sunken | QFrame::StyledPanel);
     setAcceptDrops(true);
 
-    QLabel *draggableIcon = new QLabel(this);
-    draggableIcon->setPixmap(QPixmap(":/img/icon.png"));
-    draggableIcon->move(10, 10);
-    draggableIcon->show();
-    draggableIcon->setAttribute(Qt::WA_DeleteOnClose);
+    // QLabel *draggableIcon = new QLabel(this);
+    // draggableIcon->setPixmap(QPixmap(":/img/icon.png"));
+    // draggableIcon->move(10, 10);
+    // draggableIcon->show();
+    // draggableIcon->setAttribute(Qt::WA_DeleteOnClose);
 }
 
 void card::dragEnterEvent(QDragEnterEvent *event) {
@@ -57,12 +59,16 @@ void card::dropEvent(QDropEvent *event) {
         QPixmap pixmap;
         QPoint offset;
         dataStream >> pixmap >> offset;
+        isFlipped = true;
 
-        QLabel *newIcon = new QLabel(this);
-        newIcon->setPixmap(pixmap);
-        newIcon->move(event->pos() - offset);
-        newIcon->show();
-        newIcon->setAttribute(Qt::WA_DeleteOnClose);
+        // QLabel *newIcon = new QLabel(this);
+        // newIcon->setPixmap(pixmap);
+        // newIcon->move(event->pos() - offset);
+        // newIcon->show();
+        // newIcon->setAttribute(Qt::WA_DeleteOnClose);
+
+        card *dropped_card = new card(path, z, event->pos() - offset, this);
+        dropped_card->show();
 
         if (event->source() == this) {
             event->setDropAction(Qt::MoveAction);
@@ -78,15 +84,15 @@ void card::dropEvent(QDropEvent *event) {
 }
 
 void card::mousePressEvent(QMouseEvent *event) {
-    QLabel *child = static_cast<QLabel*>(childAt(event->pos()));
+    card *child = custom_childAt(event->pos());
     if (!child) {
         return;
     }
-    const QPixmap *pixmap = child->pixmap();
+    QPixmap pixmap = child->pixmap();
 
     QByteArray itemData;
     QDataStream dataStream(&itemData, QIODevice::WriteOnly);
-    dataStream << *pixmap <<QPoint(event->pos() - child->pos());
+    dataStream << pixmap << (event->pos() - child->pos());
 
     QMimeData *mimeData = new QMimeData;
     mimeData->setData("application/x-dnditemdata", itemData);
@@ -96,19 +102,34 @@ void card::mousePressEvent(QMouseEvent *event) {
     drag->setPixmap(*pixmap);
     drag->setHotSpot(event->pos() - child->pos());
 
-    child->setParent(nullptr);
+    child->setParentItem(nullptr);
 
     if (drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction) == Qt::MoveAction) {
         delete child;
     }
     else {
-        child->setParent(this);
-        child->move(event->pos() - drag->hotSpot());
+        child->setParentItem(this);
+        child->moveBy((event->pos() - drag->hotSpot()).x(), (event->pos() - drag->hotSpot()).y());
         child->show();
     }
 }
 
+card* card::custom_childAt(QPointF position) {
+    const QList<QGraphicsItem*> list_children = this->childItems();
+    card *found_child;
+    for (QGraphicsItem* child : list_children) {
+        if (child->contains(child->mapFromParent(position))) {
+            found_child = static_cast<card*>(child);
+        }
+    }
+    return nullptr;
+}
+
+QRectF card::boundingRect() const
+{
+    return QRectF(-15.5, -15.5, 34, 34);
+}
+
 card::~card()
 {
-    delete ui;
 }

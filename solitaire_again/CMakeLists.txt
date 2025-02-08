@@ -40,8 +40,11 @@ else()
             ${PROJECT_SOURCES}
             gamewindow.h gamewindow.cpp gamewindow.ui
             resources.qrc
-            card.h card.cpp card.ui
-            cardpile.h cardpile.cpp cardpile.ui
+
+            card.h card.cpp
+            cardpile.h cardpile.cpp
+            stack.h stack.cpp
+            foundation.h foundation.cpp
         )
     endif()
 endif()
