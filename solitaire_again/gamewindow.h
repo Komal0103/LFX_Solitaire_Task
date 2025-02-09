@@ -20,20 +20,26 @@ class GameWindow : public QMainWindow
 
 public:
     explicit GameWindow(QWidget *parent = nullptr, QString uname = NULL);
-    void display_timer();
     QVector<int> shuffle_deck();
-    void assign_cards();
+    void assign_cards(QVector<int> shuffled_deck);
+    void saveSettings();
     ~GameWindow();
 
 private slots:
     void on_pushButton_clicked();
-
-    void on_pushButton_3_clicked();
+    void display_timer();
+    void restoreSettings();
+    void on_saveAndExit_clicked();
+    void on_next_clicked();
 
 private:
     Ui::GameWindow *ui;
     QTimer *timer;
     QTime initial_time;
+    Stack* stack;
+    card* card_;
+    QGraphicsScene* scene;
+    QGraphicsView* view;
     enum ALL_CARDS : int {
         D1, D2, D3, D4, D5, D6, D7, D8, D9, DJ, DQ, DK,
         H1, H2, H3, H4, H5, H6, H7, H8, H9, HJ, HQ, HK,

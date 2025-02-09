@@ -1,10 +1,12 @@
 #ifndef CARD_H
 #define CARD_H
 
+#include <QObject>
 #include <QFrame>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include<QGraphicsPixmapItem>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsSceneMouseEvent>
 
 #define IMAGE_PATH_PREFIX ":/img/"
 #define IMAGE_EXT ".png"
@@ -27,27 +29,33 @@ class card : public QGraphicsObject
     Q_OBJECT
 
 public:
-    explicit card(const QString &path, int z, QPointF position);
+    explicit card(QGraphicsItem* parent = nullptr);
     ~card();
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     void flipCard();
     card* custom_childAt(QPointF position);
+    bool card_correct(QString index);
+    void setPath(QString path);
+    void setPixmapImage(QString path);
+    void setZvalue(int z);
+    void setIndex(int ind);
+    QString getPixmapImage();
+    int getIndex();
 
 protected:
     void dragEnterEvent(QGraphicsSceneDragDropEvent *event) override;
-    void dragMoveEvent(QGraphicsSceneDragDropEvent *event) override;
+    // void dragMoveEvent(QGraphicsSceneDragDropEvent *event) override;
     void dropEvent(QGraphicsSceneDragDropEvent *event) override;
-    void mousePressEvent(QMouseEvent* event) override;
-    void dragLeaveEvent(QGraphicsSceneDragDropEvent* event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    // void dragLeaveEvent(QGraphicsSceneDragDropEvent* event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
     QPixmap pixmap;
-    int index;
-    int z;
-    bool revealed = false;
-    QString &path;
+    QString path_;
+    int index_;
     bool isFlipped = false;
 };
 

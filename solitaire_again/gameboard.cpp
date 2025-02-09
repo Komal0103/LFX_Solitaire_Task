@@ -2,6 +2,7 @@
 #include "./ui_gameboard.h"
 #include <QDebug>
 #include <QDateTime>
+
 GameBoard::GameBoard(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::GameBoard)

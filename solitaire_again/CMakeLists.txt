@@ -45,6 +45,7 @@ else()
             cardpile.h cardpile.cpp
             stack.h stack.cpp
             foundation.h foundation.cpp
+            foundation.h foundation.cpp
         )
     endif()
 endif()

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1088</width>
-    <height>600</height>
+    <width>1184</width>
+    <height>776</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
    <widget class="QLCDNumber" name="lcdNumber">
     <property name="geometry">
      <rect>
-      <x>1010</x>
+      <x>1080</x>
       <y>10</y>
       <width>64</width>
       <height>23</height>
@@ -30,8 +30,8 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>990</x>
-      <y>510</y>
+      <x>1070</x>
+      <y>700</y>
       <width>89</width>
       <height>25</height>
      </rect>
@@ -40,11 +40,11 @@
      <string>Quit</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="saveAndExit">
     <property name="geometry">
      <rect>
-      <x>858</x>
-      <y>510</y>
+      <x>930</x>
+      <y>700</y>
       <width>111</width>
       <height>25</height>
      </rect>
@@ -53,11 +53,11 @@
      <string>Save and Quit</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_3">
+   <widget class="QPushButton" name="next">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>300</y>
+      <x>10</x>
+      <y>370</y>
       <width>89</width>
       <height>25</height>
      </rect>
@@ -66,13 +66,36 @@
      <string>Next Card</string>
     </property>
    </widget>
+   <widget class="QGraphicsView" name="cardStack">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>50</y>
+      <width>191</width>
+      <height>211</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1088</width>
+     <width>1184</width>
      <height>22</height>
     </rect>
    </property>

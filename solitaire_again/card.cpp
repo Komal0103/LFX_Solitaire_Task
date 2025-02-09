@@ -1,135 +1,139 @@
 #include "card.h"
+#include <QMimeData>
+#include <QDrag>
+#include <QApplication>
+#include <QString>
+#include <QDebug>
+#include <QPainter>
+#include <QBitmap>
 
-#include <QtWidgets>
-
-card::card(const QString &path, int z, QPointF position)
+card::card(QGraphicsItem* parent)
+    : QGraphicsObject(parent)
 {
-    // ui->setupUi(this);
-    setPixmap(QPixmap(path));
-    setPos(position);
-    setZValue(z);
-    moveBy(10, 10);
-    show();
-    // setMinimumSize(200, 200);
-    // setFrameStyle(QFrame::Sunken | QFrame::StyledPanel);
-    setAcceptDrops(true);
-
-    // QLabel *draggableIcon = new QLabel(this);
-    // draggableIcon->setPixmap(QPixmap(":/img/icon.png"));
-    // draggableIcon->move(10, 10);
-    // draggableIcon->show();
-    // draggableIcon->setAttribute(Qt::WA_DeleteOnClose);
+    setAcceptDrops(false);
+    // setCursor(Qt::OpenHandCursor);
+    setAcceptedMouseButtons(Qt::LeftButton);
 }
 
-void card::dragEnterEvent(QDragEnterEvent *event) {
-    if (event->mimeData()->hasFormat("application/x-dnditemdata")) {
-        if (event->source() == this) {
-            event->setDropAction(Qt::MoveAction);
-            event->accept();
-        }
-        else {
-            event->acceptProposedAction();
-        }
-    }
-    else {
-        event->ignore();
-    }
-}
-
-void card::dragMoveEvent(QDragMoveEvent *event) {
-    if (event->mimeData()->hasFormat("application/x-dnditemdata")) {
-        if (event->source() == this) {
-            event->setDropAction(Qt::MoveAction);
-            event->accept();
-        }
-        else {
-            event->acceptProposedAction();
-        }
-    }
-    else {
-        event->ignore();
-    }
-}
-
-void card::dropEvent(QDropEvent *event) {
-    if (event->mimeData()->hasFormat("application/x-dnditemdata")) {
-        QByteArray itemData = event->mimeData()->data("application/x-dnditemdata");
-        QDataStream dataStream(&itemData, QIODevice::ReadOnly);
-
-        QPixmap pixmap;
-        QPoint offset;
-        dataStream >> pixmap >> offset;
-        isFlipped = true;
-
-        // QLabel *newIcon = new QLabel(this);
-        // newIcon->setPixmap(pixmap);
-        // newIcon->move(event->pos() - offset);
-        // newIcon->show();
-        // newIcon->setAttribute(Qt::WA_DeleteOnClose);
-
-        card *dropped_card = new card(path, z, event->pos() - offset, this);
-        dropped_card->show();
-
-        if (event->source() == this) {
-            event->setDropAction(Qt::MoveAction);
-            event->accept();
-        }
-        else {
-            event->acceptProposedAction();
-        }
-    }
-    else {
-        event->ignore();
-    }
-}
-
-void card::mousePressEvent(QMouseEvent *event) {
-    card *child = custom_childAt(event->pos());
-    if (!child) {
-        return;
-    }
-    QPixmap pixmap = child->pixmap();
-
-    QByteArray itemData;
-    QDataStream dataStream(&itemData, QIODevice::WriteOnly);
-    dataStream << pixmap << (event->pos() - child->pos());
-
-    QMimeData *mimeData = new QMimeData;
-    mimeData->setData("application/x-dnditemdata", itemData);
-
-    QDrag *drag = new QDrag(this);
-    drag->setMimeData(mimeData);
-    drag->setPixmap(*pixmap);
-    drag->setHotSpot(event->pos() - child->pos());
-
-    child->setParentItem(nullptr);
-
-    if (drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction) == Qt::MoveAction) {
-        delete child;
-    }
-    else {
-        child->setParentItem(this);
-        child->moveBy((event->pos() - drag->hotSpot()).x(), (event->pos() - drag->hotSpot()).y());
-        child->show();
-    }
-}
-
-card* card::custom_childAt(QPointF position) {
-    const QList<QGraphicsItem*> list_children = this->childItems();
-    card *found_child;
-    for (QGraphicsItem* child : list_children) {
-        if (child->contains(child->mapFromParent(position))) {
-            found_child = static_cast<card*>(child);
-        }
-    }
-    return nullptr;
-}
+card::~card() {}
 
 QRectF card::boundingRect() const
 {
-    return QRectF(-15.5, -15.5, 34, 34);
+    return QRectF(0, 0, pixmap.width(), pixmap.height());
 }
 
-card::~card()
+void card::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+    painter->scale(0.5, 0.5);
+    painter->drawPixmap(QPointF(0, 0), pixmap);
+}
+
+void card::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
+{
+    if (event->mimeData()->hasImage() && card_correct(event->mimeData()->text())) {
+        event->setAccepted(true);
+        // change the z value also somehow
+        update();
+    }
+    else {
+        event->setAccepted(false);
+    }
+}
+
+// basic implement only created. I suppose the same implementation can be used for the Foundation class event
+void card::dropEvent(QGraphicsSceneDragDropEvent *event)
+{
+    if (event->mimeData()->hasImage()) {
+        event->setAccepted(true);
+        pixmap = qvariant_cast<QPixmap>(event->mimeData()->imageData());
+        update();
+    }
+    else {
+        event->setAccepted(false);
+    }
+}
+
+void card::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    Q_UNUSED(event);
+    setCursor(Qt::ClosedHandCursor);
+}
+
+void card::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    Q_UNUSED(event);
+    setCursor(Qt::OpenHandCursor);
+}
+
+void card::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (QLineF(event->screenPos(), event->buttonDownScreenPos(Qt::LeftButton))
+            .length() < QApplication::startDragDistance()) {
+        return;
+    }
+    QDrag *drag = new QDrag(event->widget());
+    QMimeData *mime = new QMimeData;
+    drag->setMimeData(mime);
+    mime->setImageData(QImage(path_));
+    QPainter painter(&pixmap);
+    painter.translate(20, 20);
+    painter.setRenderHint(QPainter::Antialiasing);
+    // paint(&painter, nullptr, nullptr);
+    painter.end();
+
+    pixmap.setMask(pixmap.createHeuristicMask());
+    drag->setPixmap(pixmap);
+    drag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
+
+    drag->exec();
+    setCursor(Qt::OpenHandCursor);
+}
+
+bool card::card_correct (QString ind) {
+    bool done;
+    int ind_ = ind.toInt(&done);
+    qDebug() << ind_;
+    qDebug() << index_;
+    if (done) {
+        if ((ind_ - index_) % 13 == 1 || (ind_ - index_) % 13 == -1)
+            return true;
+        else
+            return false;
+    }
+    return false;
+}
+
+void card::setPath(QString path)
+{
+    path_ = path;
+}
+
+void card::setPixmapImage(QString path)
+{
+    QPixmap dpixmap = QPixmap(path);
+    pixmap = dpixmap.scaled(300, 350, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    qDebug() << pixmap.width();
+    qDebug() << pixmap.height();
+}
+
+void card::setZvalue(int z)
+{
+    setZValue(z);
+}
+
+void card::setIndex(int ind)
+{
+    index_ = ind;
+}
+
+QString card::getPixmapImage()
+{
+    return path_;
+}
+
+int card::getIndex()
+{
+    return index_;
 }

@@ -1,25 +1,36 @@
 #include "gamewindow.h"
 #include "ui_gamewindow.h"
 #include <bits/stdc++.h>
+#include <QDebug>
+#include <QSettings>
 
 GameWindow::GameWindow(QWidget *parent, QString uname)
     : QMainWindow(parent)
     , ui(new Ui::GameWindow)
 {
-    initial_time = QTime::currentTime();
     ui->setupUi(this);
+    ui->label->setText(uname);
+    restoreSettings();
+    initial_time = QTime::currentTime();
     timer = new QTimer (this);
     connect (timer, SIGNAL(timeout()), this, SLOT(display_timer()));
     timer->start(1000);
-    shuffle_deck();
-    assign_cards();
+    QVector<int> shuffled = shuffle_deck();
+    assign_cards(shuffled);
+    scene = new QGraphicsScene(0, 0, 400, 400, this);
+    scene->addItem(stack);
+    ui->cardStack->setScene(scene);
+    ui->cardStack->setRenderHint(QPainter::Antialiasing);
+    ui->cardStack->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+    ui->cardStack->setFixedSize(200, 200);
+    // view->show();
 }
 
 void GameWindow::display_timer() {
     QTime current_time = QTime::currentTime();
-    int seconds = initial_time.secsTo(current_time);
-    int minutes = seconds/60;
-    QTime time_to_display(0, minutes, seconds);
+    int seconds = initial_time.msecsTo(current_time);
+    QTime time_to_display(0, 0);
+    time_to_display = time_to_display.addMSecs(seconds);
     QString time_text = time_to_display.toString("hh:mm:ss");
     ui->lcdNumber->display(time_text);
 }
@@ -33,7 +44,18 @@ QVector<int> GameWindow::shuffle_deck()
         to_shuffle_array.push_back(i);
     }
     std::shuffle (to_shuffle_array.begin(), to_shuffle_array.end(), std::default_random_engine(seed));
+    qDebug() << to_shuffle_array;
     return to_shuffle_array;
+}
+
+void GameWindow::assign_cards(QVector<int> shuffled_deck)
+{
+    QVector<int> for_stack(24);
+    for (int i=0; i<24; ++i) {
+        for_stack[i] = shuffled_deck[i];
+    }
+    qDebug() << for_stack;
+    stack = new Stack(for_stack);
 }
 
 GameWindow::~GameWindow()
@@ -46,9 +68,22 @@ void GameWindow::on_pushButton_clicked()
     close();
 }
 
-
-void GameWindow::on_pushButton_3_clicked()
+void GameWindow::on_saveAndExit_clicked()
 {
-    // implement next card displaying functionality of card
+    QSettings settings("hehe", "Solitaire");
+    settings.setValue("geometry", saveGeometry());
+    settings.setValue("windowState", saveState());
+    close();
 }
 
+void GameWindow::restoreSettings() {
+    QSettings settings("hehe", "Solitaire");
+    restoreGeometry(settings.value("geometry").toByteArray());
+    restoreState(settings.value("windowState").toByteArray());
+}
+
+void GameWindow::on_next_clicked()
+{
+    qDebug() << "handing over functionality to Stack function";
+    stack->switch_to_next_card();
+}
