@@ -47,6 +47,9 @@ else()
             foundation.h foundation.cpp
             foundation.h foundation.cpp
             resources.qrc
+            cardtest.h cardtest.cpp
+            testwindow.h testwindow.cpp testwindow.ui
+            stacktest.h stacktest.cpp
         )
     endif()
 endif()
