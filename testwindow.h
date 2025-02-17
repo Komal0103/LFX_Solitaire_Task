@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include "cardtest.h"
+#include "stacktest.h"
 
 namespace Ui {
 class TestWindow;
@@ -21,6 +22,9 @@ public:
 
 private:
     Ui::TestWindow *ui;
+    QGraphicsScene *testScene;
+    CardTest* card_test;
+    StackTest *stack_test;
 };
 
 #endif // TESTWINDOW_H

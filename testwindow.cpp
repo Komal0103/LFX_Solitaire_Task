@@ -6,14 +6,15 @@ TestWindow::TestWindow(QWidget *parent)
     , ui(new Ui::TestWindow)
 {
     ui->setupUi(this);
-    QWidget* centralWidget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(centralWidget);
-    CardTest *card_test = new CardTest();
-    card_test->setCardParams();
-
-    layout->addWidget(card_test);
-    setCentralWidget(card_test);
-    resize(400, 300);
+    card_test = new CardTest();
+    testScene = new QGraphicsScene(0, 0, 400, 400, this);
+    testScene->addItem(card_test);
+    ui->testView->setScene(testScene);
+    ui->testView->setRenderHint(QPainter::Antialiasing);
+    ui->testView->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+    ui->testView->setFixedSize(200, 200);
+    ui->testView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->testView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
 TestWindow::~TestWindow()

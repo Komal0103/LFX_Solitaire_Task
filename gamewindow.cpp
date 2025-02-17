@@ -24,6 +24,8 @@ GameWindow::GameWindow(QWidget *parent, QString uname)
     ui->cardStack->setRenderHint(QPainter::Antialiasing);
     ui->cardStack->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     ui->cardStack->setFixedSize(200, 200);
+    ui->cardStack->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->cardStack->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     int view_height = ui->foundationD->height();
     int view_width = ui->foundationD->width();

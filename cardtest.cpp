@@ -1,24 +1,48 @@
 #include "cardtest.h"
-#include "ui_cardtest.h"
+#include <QDebug>
 
-CardTest::CardTest(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::CardTest)
+CardTest::CardTest(QGraphicsItem *parent)
+    : QGraphicsObject(parent)
 {
-    ui->setupUi(this);
-    setMinimumSize(200, 200);
+    card_ = new card();
+    setCardParams();
+    // setMinimumSize(200, 200);
 }
 
 CardTest::~CardTest()
 {
-    delete ui;
 }
 
-void CardTest::paintEvent(QPaintEvent *event)
+void CardTest::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    QPainter painter(this);
-    painter.translate(25, 25);
-    card_->paint(&painter, nullptr, nullptr);
+    qDebug() << "CardTest painter here!";
+    painter->translate(25, 25);
+    card_->paint(painter, nullptr, nullptr);
+}
+
+void CardTest::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
+{
+    card_->dragEnterEvent(event);
+}
+
+void CardTest::dropEvent(QGraphicsSceneDragDropEvent *event)
+{
+    card_->dropEvent(event);
+}
+
+void CardTest::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    card_->mousePressEvent(event);
+}
+
+void CardTest::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    card_->mouseReleaseEvent(event);
+}
+
+void CardTest::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    card_->mouseMoveEvent(event);
 }
 
 void CardTest::setCardParams() {
@@ -26,4 +50,9 @@ void CardTest::setCardParams() {
     card_->setPath(":/img/images/JOKER.png");
     card_->setPixmapImage(":/img/images/JOKER.png");
     card_->setZvalue(1);
+}
+
+QRectF CardTest::boundingRect() const
+{
+    return card_->boundingRect();
 }

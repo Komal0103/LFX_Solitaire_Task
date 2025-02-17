@@ -28,6 +28,7 @@ void card::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     Q_UNUSED(widget);
     painter->scale(0.5, 0.5);
     painter->drawPixmap(QPointF(0, 0), pixmap);
+    qDebug() << "card is painted ayyy!";
 }
 
 void card::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
@@ -48,6 +49,8 @@ void card::dropEvent(QGraphicsSceneDragDropEvent *event)
     if (event->mimeData()->hasImage()) {
         event->setAccepted(true);
         pixmap = qvariant_cast<QPixmap>(event->mimeData()->imageData());
+        int retrieved_index = qvariant_cast<int>(event->mimeData()->text());
+        qDebug() << retrieved_index;
         update();
     }
     else {
@@ -77,6 +80,7 @@ void card::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QMimeData *mime = new QMimeData;
     drag->setMimeData(mime);
     mime->setImageData(QImage(path_));
+    mime->setText(QString::number(index_));
     QPainter painter(&pixmap);
     painter.translate(20, 20);
     painter.setRenderHint(QPainter::Antialiasing);
@@ -86,6 +90,8 @@ void card::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     pixmap.setMask(pixmap.createHeuristicMask());
     drag->setPixmap(pixmap);
     drag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
+
+    qDebug() << drag->mimeData()->text();
 
     drag->exec();
     setCursor(Qt::OpenHandCursor);
@@ -114,8 +120,6 @@ void card::setPixmapImage(QString path)
 {
     QPixmap dpixmap = QPixmap(path);
     pixmap = dpixmap.scaled(300, 350, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    qDebug() << pixmap.width();
-    qDebug() << pixmap.height();
 }
 
 void card::setPixmapFromImage(QPixmap &pix_image)

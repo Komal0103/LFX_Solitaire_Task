@@ -44,7 +44,6 @@ public:
     QString getPixmapImage();
     int getIndex();
 
-protected:
     void dragEnterEvent(QGraphicsSceneDragDropEvent *event) override;
     // void dragMoveEvent(QGraphicsSceneDragDropEvent *event) override;
     void dropEvent(QGraphicsSceneDragDropEvent *event) override;

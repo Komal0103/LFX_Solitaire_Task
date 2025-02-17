@@ -16,7 +16,6 @@ public:
     void switch_to_next_card();
     int get_num_cards();
 
-protected:
     // void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     // void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
